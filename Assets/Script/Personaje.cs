@@ -4,21 +4,21 @@ using UnityEngine.AI;
 public class PlayerController : MonoBehaviour
 {
     private NavMeshAgent agent;
-    private List<GameObject> inventory;
+    // private List<GameObject> inventory;
 
     void Awake()
     {
-        inventory = new List<GameObject>();
-        agent = GetComponent<NavMeshAgent>();
+        // inventory = new List<GameObject>();
+         agent = GetComponent<NavMeshAgent>();
     }
 
-    public void AddInventory(GameObject go){
-        inventory.Add(go);
-    }
+    // public void AddInventory(GameObject go){
+    //     inventory.Add(go);
+    // }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             // Personaje.PlayAnim()
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
