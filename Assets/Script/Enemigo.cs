@@ -1,52 +1,44 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyRandomPatrol : MonoBehaviour
+public class EnemyPatrol : MonoBehaviour
 {
-    public float patrolRadius = 10f; // Radio de patrullaje
-    public float waitTime = 2f; // Tiempo de espera entre movimientos
+    public Transform[] waypoints; // Array de puntos de patrulla
+    public float waitTime = 2f; // Tiempo de espera en cada punto
 
     private NavMeshAgent agent;
+    private int currentWaypointIndex = 0;
     private float waitTimer;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        MoveToRandomPoint();
+
+        if (waypoints.Length > 0)
+        {
+            agent.SetDestination(waypoints[currentWaypointIndex].position);
+        }
     }
 
     void Update()
     {
-        // Si el enemigo llegó a su destino, espera un tiempo antes de moverse de nuevo
+        // Si el enemigo ha llegado a su destino
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
             waitTimer += Time.deltaTime;
             if (waitTimer >= waitTime)
             {
-                MoveToRandomPoint();
+                NextWaypoint();
                 waitTimer = 0f;
             }
         }
     }
 
-    void MoveToRandomPoint()
+    void NextWaypoint()
     {
-        Vector3 randomPoint = GetRandomPoint(transform.position, patrolRadius);
-        agent.SetDestination(randomPoint);
-    }
+        if (waypoints.Length == 0) return;
 
-    Vector3 GetRandomPoint(Vector3 center, float radius)
-    {
-        for (int i = 0; i < 30; i++) // Intenta 30 veces encontrar un punto válido
-        {
-            Vector3 randomPos = center + Random.insideUnitSphere * radius;
-            randomPos.y = center.y; // Mantén la misma altura
-
-            if (NavMesh.SamplePosition(randomPos, out NavMeshHit hit, 2f, NavMesh.AllAreas))
-            {
-                return hit.position;
-            }
-        }
-        return center; // Si no encuentra, se queda en su posición actual
+        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length; // Ciclo entre waypoints
+        agent.SetDestination(waypoints[currentWaypointIndex].position);
     }
 }
